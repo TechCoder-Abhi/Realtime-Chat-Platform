@@ -1,52 +1,43 @@
 # Chat Platform Frontend
 
-A real-time group chat application built with React.js, Vite, and Socket.IO.
+React frontend for the upgraded chat platform.
 
-## Getting Started
+## Frontend Architecture
 
-### Installation
+- Routing: React Router with protected chat route
+- Server data: React Query (rooms, paginated messages)
+- App state: Zustand (auth tokens + user session)
+- Realtime: Socket.IO client with room join and message ack flow
 
-```bash
-npm install
-```
+## Implemented UX Features
 
-### Development
+- Auth page for register/login
+- Protected chat page
+- Room list and room switching
+- Message persistence rendering with load older action
+- Search filter for room messages
+- Optimistic message sending
+- Connection state indicator
+- Typing indicators and online users
+- Empty states
 
-```bash
-npm run dev
-```
+## Run
 
-### Build
+Install:
+- npm install
 
-```bash
-npm run build
-```
+Dev server:
+- npm run dev
 
-### Preview Production Build
+Production build:
+- npm run build
 
-```bash
-npm run preview
-```
+Preview build:
+- npm run preview
 
-## Technologies
+## Environment
 
-- React 18
-- Vite
-- Socket.IO Client
-- ESLint
+Optional frontend environment variable in .env:
+- VITE_API_BASE=http://localhost:4600
 
-## Project Structure
-
-```
-frontend/
-├── public/          # Static assets
-├── src/
-│   ├── assets/      # Images, fonts, etc.
-│   ├── App.jsx      # Main App component
-│   ├── App.css      # App styles
-│   ├── main.jsx     # Entry point
-│   └── ws.js        # WebSocket/Socket.IO utilities
-├── index.html       # HTML template
-├── package.json     # Dependencies
-└── vite.config.js   # Vite configuration
-```
+If omitted, frontend defaults to http://localhost:4600

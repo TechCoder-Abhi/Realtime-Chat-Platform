@@ -73,16 +73,26 @@ Frontend upgrade:
 
 4. Open frontend at http://localhost:3000
 
+## Automated Tests
+
+Backend tests:
+- cd backend
+- npm test
+
+Current coverage includes request/schema validation checks.
+
 ## MongoDB Setup Summary
 
 Local MongoDB URI:
 - mongodb://127.0.0.1:27017/chat_platform
 
-Atlas URI format:
-- mongodb+srv://<user>:<password>@<cluster-url>/chat_platform?retryWrites=true&w=majority
 
 Detailed backend setup is documented in backend/README.md.
 
 ## Important Note
 
 Backend startup requires a reachable MongoDB instance. If MongoDB is not running, backend fails fast by design with clear connection error logs.
+
+## Security Posture Note
+
+The current frontend stores access/refresh tokens in localStorage for simplicity in a portfolio context. For production deployment, prefer httpOnly secure cookies with CSRF protection and short-lived access tokens.
