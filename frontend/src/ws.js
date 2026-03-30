@@ -1,5 +1,9 @@
-import { io } from 'socket.io-client';
+import { io } from 'socket.io-client'
+import { API_BASE } from './lib/api'
 
-export function connectWS() {
-    return io('http://localhost:4600');
+export function connectWS(token) {
+    return io(API_BASE, {
+        auth: { token },
+        transports: ['websocket'],
+    })
 }

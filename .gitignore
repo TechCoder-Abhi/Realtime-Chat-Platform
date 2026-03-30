@@ -23,3 +23,7 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Runtime uploads (keep folder placeholder only)
+backend/uploads/*
+!backend/uploads/.gitkeep
