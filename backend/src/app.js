@@ -1,5 +1,6 @@
 import path from 'node:path'
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
@@ -32,6 +33,7 @@ export function createApp() {
   )
 
   app.use(express.json({ limit: '1mb' }))
+  app.use(cookieParser())
   app.use(mongoSanitize())
   app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')))
 

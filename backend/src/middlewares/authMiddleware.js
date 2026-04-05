@@ -5,10 +5,20 @@ import { userRepository } from '../repositories/userRepository.js'
 import { AppError } from '../utils/AppError.js'
 
 export async function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization || ''
-  const [scheme, token] = authHeader.split(' ')
+  let token = ''
 
-  if (scheme !== 'Bearer' || !token) {
+  // Try to get token from Authorization header
+  const authHeader = req.headers.authorization || ''
+  const [scheme, headerToken] = authHeader.split(' ')
+
+  if (scheme === 'Bearer' && headerToken) {
+    token = headerToken
+  } else if (req.cookies?.accessToken) {
+    // Fall back to cookie-based token
+    token = req.cookies.accessToken
+  }
+
+  if (!token) {
     throw new AppError(API_MESSAGES.UNAUTHORIZED, 401, 'UNAUTHORIZED')
   }
 

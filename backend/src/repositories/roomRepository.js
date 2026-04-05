@@ -24,7 +24,15 @@ export const roomRepository = {
 
   listRoomsForUser(userId) {
     return RoomMember.find({ user: userId, deletedAt: null })
-      .populate({ path: 'room', match: { deletedAt: null, isArchived: false } })
+      .populate({
+        path: 'room',
+        match: { deletedAt: null, isArchived: false },
+        populate: {
+          path: 'lastMessage',
+          select: 'text sender createdAt',
+          populate: { path: 'sender', select: 'name' },
+        },
+      })
       .sort({ updatedAt: -1 })
   },
 

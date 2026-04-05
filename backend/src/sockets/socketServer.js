@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Server } from 'socket.io'
 import { env } from '../config/env.js'
+import { Room } from '../models/Room.js'
 import { roomRepository } from '../repositories/roomRepository.js'
 import { userRepository } from '../repositories/userRepository.js'
 import { messageService } from '../services/messageService.js'
@@ -87,12 +88,33 @@ export function createSocketServer(httpServer) {
           userId,
           text: payload.text,
           attachmentIds: payload.attachmentIds || [],
+          replyToId: payload.replyToId || null,
+        })
+
+        // Update room's lastMessage
+        await Room.findByIdAndUpdate(payload.roomId, {
+          lastMessage: message.id,
+          lastMessageAt: new Date(),
         })
 
         io.to(`room:${payload.roomId}`).emit('chatMessage', {
           ...message,
           clientId: payload.clientId,
         })
+
+        // Emit lastMessageUpdated event for room list updates
+        io.emit('lastMessageUpdated', {
+          roomId: payload.roomId,
+          lastMessage: {
+            id: message.id,
+            text: message.text,
+            sender: message.sender,
+            senderId: message.senderId,
+            createdAt: message.createdAt,
+          },
+          lastMessageAt: new Date(),
+        })
+
         ack?.({ ok: true, messageId: message.id, clientId: payload.clientId })
       } catch (error) {
         ack?.({ ok: false, error: error.message, clientId: payload.clientId })

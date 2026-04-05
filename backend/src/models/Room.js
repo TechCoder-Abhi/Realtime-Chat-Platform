@@ -7,6 +7,8 @@ const roomSchema = new mongoose.Schema(
     type: { type: String, enum: Object.values(ROOM_TYPES), required: true, default: ROOM_TYPES.PUBLIC },
     inviteCode: { type: String, unique: true, sparse: true },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: 'Message', default: null },
+    lastMessageAt: { type: Date, default: null },
     isArchived: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
   },
@@ -14,4 +16,5 @@ const roomSchema = new mongoose.Schema(
 )
 
 roomSchema.index({ type: 1, deletedAt: 1 })
+roomSchema.index({ lastMessageAt: -1, deletedAt: 1 })
 export const Room = mongoose.model('Room', roomSchema)

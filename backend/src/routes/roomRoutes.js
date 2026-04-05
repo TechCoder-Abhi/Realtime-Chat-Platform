@@ -14,21 +14,32 @@ import {
   directRoomParamsSchema,
   inviteParamsSchema,
   markReadSchema,
+  messageParamsSchema,
   messageQuerySchema,
   roomParamsSchema,
   sendMessageSchema,
+  updateMessageSchema,
 } from '../utils/validators.js'
 
-const uploadsDir = path.resolve(process.cwd(), 'uploads')
-fs.mkdirSync(uploadsDir, { recursive: true })
-
-const upload = multer({
-  storage: multer.diskStorage({
+// Determine storage method based on configuration
+let multerStorage
+if (env.UPLOAD_STORAGE === 'cloudinary' && env.CLOUDINARY_CLOUD_NAME) {
+  // Use memory storage for Cloudinary uploads
+  multerStorage = multer.memoryStorage()
+} else {
+  // Use disk storage for local uploads
+  const uploadsDir = path.resolve(process.cwd(), 'uploads')
+  fs.mkdirSync(uploadsDir, { recursive: true })
+  multerStorage = multer.diskStorage({
     destination: uploadsDir,
     filename(req, file, cb) {
       cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`)
     },
-  }),
+  })
+}
+
+const upload = multer({
+  storage: multerStorage,
   limits: {
     fileSize: env.MAX_FILE_SIZE_MB * 1024 * 1024,
   },
@@ -45,6 +56,9 @@ router.post('/direct/:email', validateParams(directRoomParamsSchema), asyncHandl
 router.get('/:roomId/members', validateParams(roomParamsSchema), asyncHandler(roomController.members))
 router.get('/:roomId/messages', validateParams(roomParamsSchema), validateQuery(messageQuerySchema), asyncHandler(messageController.list))
 router.post('/:roomId/messages', validateParams(roomParamsSchema), validateBody(sendMessageSchema), asyncHandler(messageController.create))
+router.patch('/:roomId/messages/:messageId', validateParams(messageParamsSchema), validateBody(updateMessageSchema), asyncHandler(messageController.edit))
+router.delete('/:roomId/messages/:messageId', validateParams(messageParamsSchema), asyncHandler(messageController.delete))
+router.delete('/:roomId/messages', validateParams(roomParamsSchema), asyncHandler(messageController.clearRoomMessages))
 router.post('/:roomId/read', validateParams(roomParamsSchema), validateBody(markReadSchema), asyncHandler(messageController.markRead))
 router.post('/:roomId/attachments', validateParams(roomParamsSchema), upload.single('file'), asyncHandler(attachmentController.upload))
 

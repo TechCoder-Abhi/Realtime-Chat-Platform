@@ -29,6 +29,7 @@ export const authService = {
       name: payload.name.trim(),
       email,
       passwordHash,
+      avatarUrl: payload.avatarUrl || '',
     })
 
     const accessToken = createAccessToken(user)
