@@ -12,6 +12,7 @@ export async function apiRequest(path, { method = 'GET', body, token } = {}) {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
+    credentials: 'include', // Include cookies in requests
   })
 
   const payload = await response.json().catch(() => ({}))
