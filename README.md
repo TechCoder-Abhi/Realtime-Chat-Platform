@@ -1,98 +1,287 @@
 # Chat Platform
 
-Full-stack real-time chat platform upgraded for resume-level quality.
+A production-style, full-stack real-time chat platform built with modern web tooling and a layered backend architecture.
 
-## Stack
+This project demonstrates practical engineering patterns for scalable chat systems, including authenticated WebSocket communication, robust API design, optimistic UI updates, role-based room access, and secure file handling.
 
-Backend:
-- Node.js + Express
+
+## Project Overview
+
+Chat Platform is a real-time messaging application that supports public, private, and direct conversations. It combines REST APIs and Socket.IO events for a responsive user experience while preserving server-side authority for permissions and data integrity.
+
+Primary goals:
+
+- Real-time messaging that remains reliable under reconnect scenarios
+- Clear separation of concerns in backend code
+- Modern frontend state management with predictable cache behavior
+- Security-first defaults for authentication and request handling
+
+## Feature Highlights
+
+### Core Messaging
+
+- Real-time room messaging via Socket.IO
+- Public, private, and direct rooms
+- Message replies, edits, and soft-delete behavior
+- Message persistence with pagination and server-side search
+- Read and delivery tracking structures
+- Typing indicators and online presence signals
+- Room list last-message preview updates
+
+### Authentication And User Management
+
+- Registration and login with password hashing
+- Access token and refresh token flow
+- Secure cookie support (httpOnly) with bearer fallback for compatibility
+- Protected frontend routes
+- Profile updates (avatar and status)
+
+### File Handling
+
+- Attachment upload per room with membership checks
+- Local storage mode
+- Optional Cloudinary storage mode
+
+### Frontend Experience
+
+- Optimistic message sending UX
+- Server state with React Query
+- App state with Zustand
+- Light and dark theme support
+- Responsive interface with reusable UI components
+
+## Technology Stack
+
+### Backend
+
+- Node.js
+- Express
 - Socket.IO
 - MongoDB + Mongoose
 - Zod validation
-- JWT access/refresh tokens
+- JWT authentication
+- Helmet, CORS, rate limiting, Mongo sanitize
 
-Frontend:
+### Frontend
+
 - React + Vite
 - React Router
 - React Query
 - Zustand
-- Socket.IO client
-- TailwindCSS
+- Socket.IO Client
+- Tailwind CSS
 
-## Implemented Features
+## Architecture
 
-Core product:
-- Register/login with hashed passwords
-- Access + refresh token auth flow
-- User profile fields: avatar URL, status, last seen
-- Public/private rooms with invite codes
-- Group chat with room permissions
-- Message persistence with pagination and search
-- Attachment upload endpoint
-- Typing indicator and online presence
-- Message delivery/read structures
+### Backend Layering
 
-Backend professionalization:
-- Layered architecture: routes/controllers/services/repositories
-- Centralized error handling
-- Consistent API responses
-- Request validation with Zod
-- RBAC middleware scaffold
-- Helmet, rate-limit, CORS hardening, mongo sanitization
-- Strict environment variable validation
+- Routes: HTTP contract and middleware composition
+- Controllers: request-to-service orchestration
+- Services: business logic and rule enforcement
+- Repositories: database query abstraction
+- Models: Mongoose schemas and indexes
 
-Realtime architecture:
+### Realtime Flow
+
 - Authenticated socket handshake
-- Per-room join permission checks
-- Message ack contract with clientId
-- Reconnect sync event for missed messages
+- Membership checks before room join and message operations
+- Message emit and acknowledgement contract
+- Reconnect-safe sync patterns
 
-Frontend upgrade:
-- Protected routes
-- Server-state management with React Query
-- App-state management with Zustand
-- Optimistic message UX in chat send flow
-- Empty states and load-more pagination action
+### Frontend State Strategy
 
-## Quick Start
+- React Query for API-backed cache and invalidation
+- Zustand for auth and UI-level persistent state
+- Local optimistic queue merged with persisted message pages
 
-1. Start MongoDB (local service) or provision Atlas and get connection URI.
-2. Backend setup:
+## Repository Structure
 
-   - cd backend
-   - copy .env.example to .env and fill secrets
-   - npm install
-   - npm run seed
-   - npm run dev
+Top-level folders:
 
-3. Frontend setup:
+- backend: Express API, Socket.IO server, domain logic
+- frontend: React client application
 
-   - cd frontend
-   - npm install
-   - npm run dev
+Backend key modules:
 
-4. Open frontend at http://localhost:3000
+- src/controllers
+- src/services
+- src/repositories
+- src/models
+- src/routes
+- src/sockets
+- src/middlewares
 
-## Automated Tests
+Frontend key modules:
 
-Backend tests:
-- cd backend
-- npm test
+- src/components
+- src/components/ui
+- src/store
+- src/lib
 
-Current coverage includes request/schema validation checks.
+## Getting Started
 
-## MongoDB Setup Summary
+### Prerequisites
 
-Local MongoDB URI:
-- mongodb://127.0.0.1:27017/chat_platform
+- Node.js 18+
+- npm 9+
+- MongoDB (local or Atlas)
+
+### 1) Clone And Install
+
+From workspace root:
+
+```bash
+npm install
+npm install --prefix backend
+npm install --prefix frontend
+```
+
+### 2) Configure Environment
+
+Backend only:
+
+```bash
+cd backend
+copy .env.example .env
+```
+
+Populate required values in backend .env.
+
+### 3) Seed Data (Optional But Recommended)
+
+```bash
+npm run seed --prefix backend
+```
+
+### 4) Start Development Servers
+
+Run both apps together:
+
+```bash
+npm run dev
+```
+
+Or run separately:
+
+```bash
+npm run dev --prefix backend
+npm run dev --prefix frontend
+```
+
+### 5) Open Application
+
+- Frontend: http://localhost:3000
+- Backend: http://localhost:4600
+
+## Environment Configuration
+
+Important backend environment variables:
+
+- PORT
+- FRONTEND_ORIGIN
+- MONGODB_URI
+- JWT_ACCESS_SECRET
+- JWT_REFRESH_SECRET
+- ACCESS_TOKEN_TTL
+- REFRESH_TOKEN_TTL_DAYS
+- RATE_LIMIT_WINDOW_MS
+- RATE_LIMIT_MAX
+- MAX_FILE_SIZE_MB
+
+Upload mode controls:
+
+- UPLOAD_STORAGE=local
+- UPLOAD_STORAGE=cloudinary
+
+Cloudinary settings (required only for cloud mode):
+
+- CLOUDINARY_CLOUD_NAME
+- CLOUDINARY_API_KEY
+- CLOUDINARY_API_SECRET
+
+## Available Scripts
+
+Workspace:
+
+- npm run dev
+- npm run dev:backend
+- npm run dev:frontend
+- npm run build
+- npm run lint
+- npm run test
+
+Backend:
+
+- npm run dev --prefix backend
+- npm run start --prefix backend
+- npm run seed --prefix backend
+- npm run test --prefix backend
+- npm run storage:cleanup --prefix backend
+
+Frontend:
+
+- npm run dev --prefix frontend
+- npm run build --prefix frontend
+- npm run preview --prefix frontend
+- npm run lint --prefix frontend
+
+## API Overview
+
+Representative endpoint groups:
+
+- Authentication
+   - POST /api/auth/register
+   - POST /api/auth/login
+   - POST /api/auth/refresh
+   - POST /api/auth/logout
+   - GET /api/auth/me
+
+- Rooms
+   - GET /api/rooms
+   - POST /api/rooms
+   - POST /api/rooms/join/:inviteCode
+   - POST /api/rooms/direct/:email
+   - GET /api/rooms/:roomId/members
+
+- Messages
+   - GET /api/rooms/:roomId/messages
+   - POST /api/rooms/:roomId/messages
+   - PATCH /api/rooms/:roomId/messages/:messageId
+   - DELETE /api/rooms/:roomId/messages/:messageId
+   - DELETE /api/rooms/:roomId/messages
+   - POST /api/rooms/:roomId/read
+
+- Attachments
+   - POST /api/rooms/:roomId/attachments
+
+## Data Model Overview
+
+Primary entities:
+
+- User
+- Room
+- RoomMember
+- Message
+- Attachment
+- Notification
+- RefreshToken
+
+Selected model capabilities:
+
+- Message reply reference and edit timestamp
+- Soft deletion support on messages and attachments
+- Room-level lastMessage and lastMessageAt fields for list previews
 
 
-Detailed backend setup is documented in backend/README.md.
+## Security Posture
 
-## Important Note
+Implemented protections:
 
-Backend startup requires a reachable MongoDB instance. If MongoDB is not running, backend fails fast by design with clear connection error logs.
+- Helmet headers
+- CORS origin restriction
+- Request rate limiting
+- MongoDB sanitize middleware
+- Input validation with Zod
+- Secure cookie support for auth tokens
 
-## Security Posture Note
 
-The current frontend stores access/refresh tokens in localStorage for simplicity in a portfolio context. For production deployment, prefer httpOnly secure cookies with CSRF protection and short-lived access tokens.

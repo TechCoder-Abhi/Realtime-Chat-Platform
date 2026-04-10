@@ -9,11 +9,13 @@ const attachmentSchema = new mongoose.Schema(
     mimeType: { type: String, required: true },
     size: { type: Number, required: true },
     url: { type: String, required: true },
+    cloudinaryPublicId: { type: String, default: null },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true }
 )
 
 attachmentSchema.index({ room: 1, createdAt: -1 })
+attachmentSchema.index({ message: 1, createdAt: 1, deletedAt: 1 })
 
 export const Attachment = mongoose.model('Attachment', attachmentSchema)

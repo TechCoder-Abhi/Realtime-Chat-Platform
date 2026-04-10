@@ -7,7 +7,7 @@ import { ROOM_TYPES } from '../constants/api.js'
 import { AppError } from '../utils/AppError.js'
 
 function mapRoom(room) {
-  return {
+  const mapped = {
     id: room.id,
     name: room.name,
     type: room.type,
@@ -15,6 +15,20 @@ function mapRoom(room) {
     createdAt: room.createdAt,
     updatedAt: room.updatedAt,
   }
+
+  // Include last message preview if available
+  if (room.lastMessage) {
+    mapped.lastMessage = {
+      id: room.lastMessage._id || room.lastMessage.id,
+      text: room.lastMessage.text,
+      sender: room.lastMessage.sender?.name || 'Unknown',
+      senderId: room.lastMessage.sender?._id?.toString?.() || '',
+      createdAt: room.lastMessage.createdAt,
+    }
+    mapped.lastMessageAt = room.lastMessageAt
+  }
+
+  return mapped
 }
 
 export const roomService = {
@@ -38,10 +52,21 @@ export const roomService = {
     const memberships = await roomRepository.listRoomsForUser(userId)
     return memberships
       .filter((item) => item.room)
-      .map((item) => ({
-        ...mapRoom(item.room),
-        myRole: item.role,
-      }))
+      .map((item) => {
+        // Populate lastMessage for display
+        const room = item.room
+        if (room.lastMessage && typeof room.lastMessage === 'object' && room.lastMessage.populate) {
+          // Room is a Mongoose doc with lastMessage ref
+          return {
+            ...mapRoom(room),
+            myRole: item.role,
+          }
+        }
+        return {
+          ...mapRoom(room),
+          myRole: item.role,
+        }
+      })
   },
 
   async createRoom({ userId, name, type }) {

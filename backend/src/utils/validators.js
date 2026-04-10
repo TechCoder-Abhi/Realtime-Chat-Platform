@@ -6,6 +6,7 @@ export const registerSchema = z.object({
   name: z.string().trim().min(2).max(40),
   email: z.string().trim().email(),
   password: z.string().min(6).max(100),
+  avatarUrl: z.string().url().optional(),
 })
 
 export const loginSchema = z.object({
@@ -39,11 +40,21 @@ export const roomParamsSchema = z.object({
   roomId: objectIdSchema,
 })
 
+export const messageParamsSchema = z.object({
+  roomId: objectIdSchema,
+  messageId: objectIdSchema,
+})
+
 export const sendMessageSchema = z.object({
   text: z.string().trim().max(4000).optional(),
   attachmentIds: z.array(z.string().trim()).max(5).optional(),
+  replyToId: objectIdSchema.optional(),
 }).refine((data) => Boolean(data.text) || (data.attachmentIds && data.attachmentIds.length > 0), {
   message: 'Either text or attachmentIds is required',
+})
+
+export const updateMessageSchema = z.object({
+  text: z.string().trim().min(1).max(4000),
 })
 
 export const messageQuerySchema = z.object({

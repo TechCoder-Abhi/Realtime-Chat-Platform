@@ -19,6 +19,11 @@ export const messageRepository = {
     const docs = await Message.find(query)
       .populate('sender', 'name avatarUrl')
       .populate('attachments')
+      .populate({
+        path: 'replyTo',
+        select: 'text sender',
+        populate: { path: 'sender', select: 'name avatarUrl' },
+      })
       .sort({ createdAt: -1 })
       .limit(limit)
 
@@ -54,7 +59,53 @@ export const messageRepository = {
     })
       .populate('sender', 'name avatarUrl')
       .populate('attachments')
+      .populate({
+        path: 'replyTo',
+        select: 'text sender',
+        populate: { path: 'sender', select: 'name avatarUrl' },
+      })
       .sort({ createdAt: 1 })
       .limit(limit)
+  },
+
+  findByIdInRoom(messageId, roomId) {
+    return Message.findOne({ _id: messageId, room: roomId, deletedAt: null })
+      .populate('sender', 'name avatarUrl')
+      .populate('attachments')
+      .populate({
+        path: 'replyTo',
+        select: 'text sender',
+        populate: { path: 'sender', select: 'name avatarUrl' },
+      })
+  },
+
+  updateMessageText(messageId, text) {
+    return Message.findOneAndUpdate(
+      { _id: messageId, deletedAt: null },
+      { $set: { text, editedAt: new Date() } },
+      { new: true }
+    )
+      .populate('sender', 'name avatarUrl')
+      .populate('attachments')
+      .populate({
+        path: 'replyTo',
+        select: 'text sender',
+        populate: { path: 'sender', select: 'name avatarUrl' },
+      })
+  },
+
+  softDeleteMessage(messageId) {
+    return Message.findOneAndUpdate(
+      { _id: messageId, deletedAt: null },
+      { $set: { deletedAt: new Date() } },
+      { new: true }
+    )
+  },
+
+  softDeleteByRoom(roomId) {
+    return Message.updateMany(
+      { room: roomId, deletedAt: null },
+      { $set: { deletedAt: new Date() } }
+    )
   },
 }

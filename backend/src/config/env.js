@@ -22,6 +22,11 @@ export const env = {
   RATE_LIMIT_WINDOW_MS: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
   RATE_LIMIT_MAX: Number(process.env.RATE_LIMIT_MAX || 300),
   MAX_FILE_SIZE_MB: Number(process.env.MAX_FILE_SIZE_MB || 5),
+  // Cloudinary configuration (optional - falls back to local storage)
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
+  UPLOAD_STORAGE: process.env.UPLOAD_STORAGE || 'local', // 'local' or 'cloudinary'
 }
 
 if (!Number.isFinite(env.PORT) || env.PORT <= 0) {

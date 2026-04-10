@@ -9,6 +9,7 @@ import { useAuthStore } from './store/authStore'
 export default function App() {
   const [loading, setLoading] = useState(true)
   const accessToken = useAuthStore((s) => s.accessToken)
+  const theme = useAuthStore((s) => s.theme)
   const setUser = useAuthStore((s) => s.setUser)
   const clearAuth = useAuthStore((s) => s.clearAuth)
 
@@ -38,6 +39,11 @@ export default function App() {
       active = false
     }
   }, [accessToken, clearAuth, setUser])
+
+  // Apply theme to document root
+  useEffect(() => {
+    document.documentElement.className = theme
+  }, [theme])
 
   if (loading) {
     return <div className="h-screen bg-[#111B21]" />

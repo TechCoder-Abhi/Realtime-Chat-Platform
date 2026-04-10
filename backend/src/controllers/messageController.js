@@ -21,13 +21,43 @@ export const messageController = {
       userId: req.auth.userId,
       text: req.body.text,
       attachmentIds: req.body.attachmentIds || [],
+      replyToId: req.body.replyToId || null,
     })
 
     return sendSuccess(res, { message }, undefined, 201)
   },
 
+  async edit(req, res) {
+    const message = await messageService.editMessage({
+      roomId: req.params.roomId,
+      messageId: req.params.messageId,
+      userId: req.auth.userId,
+      text: req.body.text,
+    })
+
+    return sendSuccess(res, { message })
+  },
+
+  async delete(req, res) {
+    await messageService.deleteMessage({
+      roomId: req.params.roomId,
+      messageId: req.params.messageId,
+      userId: req.auth.userId,
+    })
+
+    return sendSuccess(res, { ok: true })
+  },
+
   async markRead(req, res) {
     await messageService.markRoomRead({ roomId: req.params.roomId, userId: req.auth.userId })
+    return sendSuccess(res, { ok: true })
+  },
+
+  async clearRoomMessages(req, res) {
+    await messageService.clearRoomMessages({
+      roomId: req.params.roomId,
+      userId: req.auth.userId,
+    })
     return sendSuccess(res, { ok: true })
   },
 }
